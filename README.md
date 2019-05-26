@@ -13,7 +13,6 @@ a shared mailbox, boss, hacker,...) also gets access to these passwords. This pr
 secret information limited in time while at the same time encouraging the use of the right tools for secure storage.
 
 # Features
-* XXTEA encryption with secure randomly generated keys
 * Time limit for shares between 5 minutes and 30 days
 
 # Requirements for running (or tested with)
