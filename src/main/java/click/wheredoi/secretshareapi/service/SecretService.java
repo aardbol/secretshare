@@ -33,7 +33,7 @@ public class SecretService {
      * @param secretDTO SecretDTO object containing the encrypted data and expiring info
      * @return ID of the secret
      */
-    public String createSecret(SecretDTO secretDTO) {
+    public Secret createSecret(SecretDTO secretDTO) {
         Secret secret = new Secret();
         char[] allowCharactersInNanoId = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 
@@ -41,7 +41,7 @@ public class SecretService {
         secret.setData(secretDTO.getData());
         secret.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(secretDTO.getExpires())));
 
-        return secretRepository.save(secret).getId();
+        return secretRepository.save(secret);
     }
 
     /**

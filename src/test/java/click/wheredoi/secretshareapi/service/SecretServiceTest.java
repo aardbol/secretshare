@@ -59,12 +59,12 @@ class SecretServiceTest {
 
     @Test
     // It this a useful test or can it be improved? Because all it does is "test" the save() method of the repository
-    void doesCreateSecretReturnNanoId() {
+    void doesCreateSecretReturnSecretWithNanoId() {
         Mockito.when(secretRepository.save(Mockito.any(Secret.class))).thenReturn(secret);
-        String id = secretService.createSecret(secretDTO);
+        Secret secret = secretService.createSecret(secretDTO);
 
-        assertNotNull(id);
-        assertTrue(id.matches("[0-9a-zA-Z]{6}"));
+        assertNotNull(secret);
+        assertTrue(secret.getId().matches("[0-9a-zA-Z]{6}"));
     }
 
     @Test

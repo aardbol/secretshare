@@ -26,7 +26,7 @@ public class IndexController {
     }
 
     @PostMapping
-    String createSecret(@Valid @RequestBody SecretDTO secretDTO, BindingResult bindingResult) {
+    Secret createSecret(@Valid @RequestBody SecretDTO secretDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new BadRequestException(bindingResult.getAllErrors().toString());
         }

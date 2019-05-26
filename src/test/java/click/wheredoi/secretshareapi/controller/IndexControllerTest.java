@@ -30,7 +30,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class IndexControllerTest extends AbstractRestControllerTest {
     private char[] allowCharactersInNanoId = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
@@ -90,17 +91,19 @@ class IndexControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createSecretReturnsId() throws Exception {
+    void createSecretReturnsSecret() throws Exception {
         secretDTO.setData(secret.getData());
         secretDTO.setExpires(TimeUnit.DAYS.toMinutes(30));
 
-        Mockito.when(secretService.createSecret(Mockito.any(SecretDTO.class))).thenReturn(nanoId);
+        Mockito.when(secretService.createSecret(Mockito.any(SecretDTO.class))).thenReturn(secret);
 
         mockMvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(secretDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(nanoId));
+                .andExpect(jsonPath("$.id", equalTo(nanoId)))
+                .andExpect(jsonPath("$.data", equalTo(secret.getData())))
+                .andExpect(jsonPath("$.expires", equalTo(secret.getExpires().getTime())));
     }
 
     @Test
