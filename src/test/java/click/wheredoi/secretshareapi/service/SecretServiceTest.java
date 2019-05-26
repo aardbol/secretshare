@@ -44,12 +44,12 @@ class SecretServiceTest {
 
         secretDTO = new SecretDTO();
         secretDTO.setData("hpYKofvmUoE=");
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)));
+        secretDTO.setExpires(60);
 
         secret = new Secret();
         secret.setId(NanoIdUtils.randomNanoId(new Random(), allowCharactersInNanoId,6));
         secret.setData(secretDTO.getData());
-        secret.setExpires(secretDTO.getExpires());
+        secret.setExpires(new Timestamp(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(secretDTO.getExpires())));
 
         secretNotExpired = new Secret();
         secret.setId(NanoIdUtils.randomNanoId(new Random(), allowCharactersInNanoId,6));

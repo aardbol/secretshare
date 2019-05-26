@@ -14,7 +14,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.sql.Timestamp;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +45,7 @@ class SecretDTOTest {
 
     @Test
     void dataIsNullReturnsValidationError() {
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(30));
         Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
@@ -55,7 +54,7 @@ class SecretDTOTest {
 
     @Test
     void dataIsEmptyReturnsValidationError() {
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(30));
         secretDTO.setData("");
         Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
 
@@ -69,48 +68,38 @@ class SecretDTOTest {
         Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
-        assertEquals("{javax.validation.constraints.NotNull.message}", violations.iterator().next().getMessageTemplate());
-    }
-
-    @Test
-    void expiresIsInPastReturnsValidationError() {
-        secretDTO.setData("hpYKofvmUoE=");
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)));
-        Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
-
-        assertEquals(1, violations.size());
-        assertEquals("{javax.validation.constraints.Future.message}", violations.iterator().next().getMessageTemplate());
+        assertEquals("{javax.validation.constraints.Min.message}", violations.iterator().next().getMessageTemplate());
     }
 
     @Test
     void expiresNotRespectingMinimumReturnsValidationError() {
         secretDTO.setData("hpYKofvmUoE=");
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(4)));
+        secretDTO.setExpires(-5);
         Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
-        assertEquals("must be between set minimum and maximum values", violations.iterator().next().getMessageTemplate());
+        assertEquals("{javax.validation.constraints.Min.message}", violations.iterator().next().getMessageTemplate());
 
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1)));
+        secretDTO.setExpires(4);
         Set<ConstraintViolation<SecretDTO>> violations2 = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
-        assertEquals("must be between set minimum and maximum values", violations2.iterator().next().getMessageTemplate());
+        assertEquals("{javax.validation.constraints.Min.message}", violations2.iterator().next().getMessageTemplate());
     }
 
     @Test
     void expiresNotRespectingMaximumReturnsValidationError() {
         secretDTO.setData("hpYKofvmUoE=");
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(31)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(31));
         Set<ConstraintViolation<SecretDTO>> violations = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
-        assertEquals("must be between set minimum and maximum values", violations.iterator().next().getMessageTemplate());
+        assertEquals("{javax.validation.constraints.Max.message}", violations.iterator().next().getMessageTemplate());
 
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1000)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(1000));
         Set<ConstraintViolation<SecretDTO>> violations2 = validator.validate(secretDTO);
 
         assertEquals(1, violations.size());
-        assertEquals("must be between set minimum and maximum values", violations2.iterator().next().getMessageTemplate());
+        assertEquals("{javax.validation.constraints.Max.message}", violations2.iterator().next().getMessageTemplate());
     }
 }

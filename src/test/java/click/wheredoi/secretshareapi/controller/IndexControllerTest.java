@@ -61,7 +61,7 @@ class IndexControllerTest extends AbstractRestControllerTest {
 
     @Test
     void createSecretEmptyDataReturnsBadRequest() throws Exception {
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMillis(30));
 
         mockMvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ class IndexControllerTest extends AbstractRestControllerTest {
 
     @Test
     void createSecretNonFutureExpiresReturnsBadRequest() throws Exception {
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(-1));
 
         mockMvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class IndexControllerTest extends AbstractRestControllerTest {
     @Test
     void createSecretReturnsId() throws Exception {
         secretDTO.setData(secret.getData());
-        secretDTO.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
+        secretDTO.setExpires(TimeUnit.DAYS.toMinutes(30));
 
         Mockito.when(secretService.createSecret(Mockito.any(SecretDTO.class))).thenReturn(nanoId);
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SecretService {
@@ -38,7 +39,7 @@ public class SecretService {
 
         secret.setId(NanoIdUtils.randomNanoId(new Random(), allowCharactersInNanoId,6));
         secret.setData(secretDTO.getData());
-        secret.setExpires(secretDTO.getExpires());
+        secret.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(secretDTO.getExpires())));
 
         return secretRepository.save(secret).getId();
     }
