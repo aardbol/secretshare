@@ -7,6 +7,7 @@
 
 package click.wheredoi.secretshareapi.dto;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,14 +24,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SecretDTOTest {
-    private Validator validator;
+    private static Validator validator;
     private SecretDTO secretDTO;
+
+    @BeforeAll
+    static void initialSetUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
 
     @BeforeEach
     void setUp() {
         secretDTO = new SecretDTO();
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
     }
 
     @Test
