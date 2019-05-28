@@ -8,7 +8,7 @@
 package click.wheredoi.secretshareapi.controller;
 
 import click.wheredoi.secretshareapi.dto.SecretDTO;
-import click.wheredoi.secretshareapi.exceptions.NotFoundException;
+import click.wheredoi.secretshareapi.exception.NotFoundException;
 import click.wheredoi.secretshareapi.model.Secret;
 import click.wheredoi.secretshareapi.service.SecretService;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;

@@ -5,7 +5,7 @@
  * See LICENSE, LICENTIE or for other translations: https://joinup.ec.europa.eu/collection/eupl/eupl-text-11-12
  */
 
-package click.wheredoi.secretshareapi.exceptions;
+package click.wheredoi.secretshareapi.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

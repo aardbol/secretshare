@@ -8,7 +8,7 @@
 package click.wheredoi.secretshareapi.controller;
 
 import click.wheredoi.secretshareapi.dto.SecretDTO;
-import click.wheredoi.secretshareapi.exceptions.BadRequestException;
+import click.wheredoi.secretshareapi.exception.BadRequestException;
 import click.wheredoi.secretshareapi.model.Secret;
 import click.wheredoi.secretshareapi.service.SecretService;
 import org.springframework.validation.BindingResult;
