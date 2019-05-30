@@ -1,4 +1,4 @@
-# Share a Secret
+# Project
 API for sharing time limited encrypted secrets over the internet.
 
 This project was created to allow sharing sensitive information by email in a more secure way, but is not limited to such
@@ -14,6 +14,7 @@ secret information limited in time while at the same time encouraging the use of
 
 # Features
 * Time limit for shares between 5 minutes and 30 days
+* A web frontend is available at https://github.com/aardbol/secretshareweb
 
 # Requirements for running (or tested with)
 * Java 11
