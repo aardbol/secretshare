@@ -18,6 +18,7 @@ privacy.
 # Features
 * Time limit for shares between 5 minutes and 30 days
 * A web frontend is available at https://github.com/aardbol/secretshareweb
+* Keep a records of when a secret was access until the secret is expired
 
 # Requirements for running (or tested with)
 * Java 11
