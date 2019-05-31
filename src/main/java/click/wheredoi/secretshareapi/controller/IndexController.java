@@ -14,6 +14,7 @@ import click.wheredoi.secretshareapi.service.SecretService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @CrossOrigin
@@ -34,7 +35,7 @@ public class IndexController {
     }
 
     @GetMapping("{id:[a-zA-Z0-9]{6}}")
-    Secret getSecret(@PathVariable String id) {
-        return secretService.getSecret(id);
+    Secret getSecret(@PathVariable String id, HttpServletRequest request) {
+        return secretService.getSecret(id, request);
     }
 }

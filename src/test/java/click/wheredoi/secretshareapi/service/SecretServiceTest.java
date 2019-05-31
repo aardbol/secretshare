@@ -19,7 +19,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.UnknownHostException;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +41,12 @@ class SecretServiceTest {
     @Mock
     private SecretRepository secretRepository;
 
+    @Mock
+    private AccessService accessService;
+
+    @Mock
+    private HttpServletRequest request;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -52,14 +61,14 @@ class SecretServiceTest {
         secret.setExpires(new Timestamp(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(secretDTO.getExpires())));
 
         secretNotExpired = new Secret();
-        secret.setId(NanoIdUtils.randomNanoId(new Random(), allowCharactersInNanoId,6));
-        secret.setData(secretDTO.getData());
+        secretNotExpired.setId(NanoIdUtils.randomNanoId(new Random(), allowCharactersInNanoId,6));
+        secretNotExpired.setData(secretDTO.getData());
         secretNotExpired.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
+        secretNotExpired.setAccessRecords(new HashSet<>());
     }
 
     @Test
-    // It this a useful test or can it be improved? Because all it does is "test" the save() method of the repository
-    void doesCreateSecretReturnSecretWithNanoId() {
+    void isProperNanoIdReturned() {
         Mockito.when(secretRepository.save(Mockito.any(Secret.class))).thenReturn(secret);
         Secret secret = secretService.createSecret(secretDTO);
 
@@ -71,21 +80,22 @@ class SecretServiceTest {
     void getSecretExpiredShouldThrowNotFound() {
         Mockito.when(secretRepository.findById(secret.getId())).thenReturn(Optional.of(secret));
 
-        assertThrows(NotFoundException.class, ()-> secretService.getSecret(secret.getId()));
+        assertThrows(NotFoundException.class, ()-> secretService.getSecret(secret.getId(), request));
     }
 
     @Test
-    void getSecretNonExpiredShouldReturnSecret() {
+    void getSecretNonExpiredShouldReturnSecret() throws UnknownHostException {
         Mockito.when(secretRepository.findById(secretNotExpired.getId())).thenReturn(Optional.of(secretNotExpired));
-        Secret secret1 = secretService.getSecret(secretNotExpired.getId());
+        Mockito.doNothing().when(accessService).addAccessRecord(secretNotExpired.getId(), request);
+        Secret secret1 = secretService.getSecret(secretNotExpired.getId(), request);
 
         assertEquals(secretNotExpired.getId(), secret1.getId());
     }
 
     @Test
-    void getSecretNonExistingShouldReturnNull() {
+    void getSecretNonExistingShouldThrowNotFound() {
         Mockito.when(secretRepository.findById("test")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, ()-> secretService.getSecret("test"));
+        assertThrows(NotFoundException.class, ()-> secretService.getSecret("test", request));
     }
 }

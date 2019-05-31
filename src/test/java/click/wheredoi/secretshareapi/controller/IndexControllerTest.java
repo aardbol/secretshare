@@ -9,7 +9,9 @@ package click.wheredoi.secretshareapi.controller;
 
 import click.wheredoi.secretshareapi.dto.SecretDTO;
 import click.wheredoi.secretshareapi.exception.NotFoundException;
+import click.wheredoi.secretshareapi.model.AccessRecord;
 import click.wheredoi.secretshareapi.model.Secret;
+import click.wheredoi.secretshareapi.service.AccessService;
 import click.wheredoi.secretshareapi.service.SecretService;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +24,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,7 +44,13 @@ class IndexControllerTest extends AbstractRestControllerTest {
     private SecretDTO secretDTO;
 
     @Mock
+    private HttpServletRequest request;
+
+    @Mock
     private SecretService secretService;
+
+    @Mock
+    private AccessService accessService;
 
     @InjectMocks
     private IndexController indexController;
@@ -58,6 +68,14 @@ class IndexControllerTest extends AbstractRestControllerTest {
         secret.setData("hpYKofvmUoE=");
         secret.setExpires(new Timestamp(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)));
         secret.setCreated(new Timestamp(System.currentTimeMillis()));
+
+        AccessRecord accessRecord = new AccessRecord();
+        accessRecord.setIp("127.0.0.1");
+        accessRecord.setId(1);
+        accessRecord.setSecret(secret.getId());
+        Set<AccessRecord> accessRecords = new HashSet<>();
+        accessRecords.add(accessRecord);
+        secret.setAccessRecords(accessRecords);
     }
 
     @Test
@@ -107,14 +125,15 @@ class IndexControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void getSecretShouldReturnSecret() throws Exception {
-        Mockito.when(secretService.getSecret(nanoId)).thenReturn(secret);
+    void getSecretShouldReturnSecretAndAccessRecords() throws Exception {
+        Mockito.when(secretService.getSecret(Mockito.eq(nanoId), Mockito.any(HttpServletRequest.class))).thenReturn(secret);
 
         mockMvc.perform(get("/" + nanoId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(nanoId)))
                 .andExpect(jsonPath("$.data", equalTo(secret.getData())))
-                .andExpect(jsonPath("$.expires", equalTo(secret.getExpires().getTime())));
+                .andExpect(jsonPath("$.expires", equalTo(secret.getExpires().getTime())))
+                .andExpect(jsonPath("$.accessRecords[0].secret", equalTo(secret.getId())));
     }
 
     @Test
@@ -125,7 +144,9 @@ class IndexControllerTest extends AbstractRestControllerTest {
 
     @Test
     void getSecretNonExistingIdReturnsNotFound() throws Exception {
-        Mockito.when(secretService.getSecret(anyString())).thenThrow(NotFoundException.class);
+        Mockito.when(secretService.getSecret(Mockito.eq("test12"), Mockito.any(HttpServletRequest.class)))
+                .thenThrow(NotFoundException.class);
+        Mockito.doNothing().when(accessService).addAccessRecord(secret.getId(), request);
 
         mockMvc.perform(get("/test12"))
                 .andExpect(status().isNotFound());

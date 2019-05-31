@@ -14,6 +14,7 @@ import click.wheredoi.secretshareapi.repo.SecretRepository;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -21,10 +22,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SecretService {
 
-    private SecretRepository secretRepository;
+    private final SecretRepository secretRepository;
 
-    public SecretService(SecretRepository secretRepository) {
+    private final AccessService accessService;
+
+    public SecretService(SecretRepository secretRepository, AccessService accessService) {
         this.secretRepository = secretRepository;
+        this.accessService = accessService;
     }
 
     /**
@@ -45,18 +49,22 @@ public class SecretService {
     }
 
     /**
-     * Get a non-expired secret by ID
+     * Get a non-expired secret by ID and add an keep a record of the user accessing this secret
      *
      * @param id NanoId
      * @return Secret
      */
-    public Secret getSecret(String id) {
+    public Secret getSecret(String id, HttpServletRequest request) {
         Secret secret = secretRepository.findById(id).orElse(null);
 
         // Also check for expired shares that haven't been deleted yet
         if (secret == null || secret.getExpires().before(new Timestamp(System.currentTimeMillis()))) {
             throw new NotFoundException();
         }
+        accessService.addAccessRecord(id, request);
+        // Because of lazy loading, we need to force the loading of the access records
+        secret.getAccessRecords().size();
+
         return secret;
     }
 

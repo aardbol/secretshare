@@ -7,11 +7,12 @@
 
 package click.wheredoi.secretshareapi.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
 @Table(name = "secrets")
@@ -21,11 +22,14 @@ public class Secret {
 
     private String data;
 
-    @Column(insertable = false, updatable = false)
+    @Column(insertable = false)
+    @Generated(GenerationTime.INSERT)
     private Timestamp created;
 
-    @Column(updatable = false)
     private Timestamp expires;
+
+    @OneToMany(mappedBy = "secret")
+    private Set<AccessRecord> accessRecords;
 
     public String getId() {
         return id;
@@ -57,5 +61,13 @@ public class Secret {
 
     public void setExpires(Timestamp expires) {
         this.expires = expires;
+    }
+
+    public Set<AccessRecord> getAccessRecords() {
+        return accessRecords;
+    }
+
+    public void setAccessRecords(Set<AccessRecord> accessRecords) {
+        this.accessRecords = accessRecords;
     }
 }
