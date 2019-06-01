@@ -38,4 +38,9 @@ public class IndexController {
     Secret getSecret(@PathVariable String id, HttpServletRequest request) {
         return secretService.getSecret(id, request);
     }
+
+    @GetMapping("version")
+    String getVersion() {
+        return getClass().getPackage().getName() + " " + getClass().getPackage().getImplementationVersion();
+    }
 }
