@@ -2,6 +2,7 @@ HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 *.log
+application-production.properties
 
 ### STS ###
 .apt_generated
