@@ -31,8 +31,12 @@ public class AccessService {
     public void addAccessRecord(String secretId, HttpServletRequest request) {
         AccessRecord accessRecord = new AccessRecord();
         accessRecord.setSecret(secretId);
-        accessRecord.setIp(request.getRemoteAddr());
 
+        if (request.getHeader("X-Real-IP") != null && !request.getHeader("X-Real-IP").equals("")) {
+            accessRecord.setIp(request.getHeader("X-Real-IP"));
+        } else {
+            accessRecord.setIp(request.getRemoteAddr());
+        }
         accessRepository.save(accessRecord);
     }
 }
