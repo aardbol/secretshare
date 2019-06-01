@@ -7,6 +7,7 @@
 
 package click.wheredoi.secretshareapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 
@@ -18,6 +19,7 @@ import java.sql.Timestamp;
 public class AccessRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer id;
 
     private String ip;
@@ -26,6 +28,7 @@ public class AccessRecord {
     @Generated(GenerationTime.INSERT)
     private Timestamp time;
 
+    @JsonIgnore
     private String secret;
 
     public Integer getId() {
