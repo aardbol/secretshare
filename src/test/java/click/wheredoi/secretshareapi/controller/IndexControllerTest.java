@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -73,6 +74,7 @@ class IndexControllerTest extends AbstractRestControllerTest {
         accessRecord.setIp("127.0.0.1");
         accessRecord.setId(1);
         accessRecord.setSecret(secret.getId());
+        accessRecord.setTime(new Timestamp(System.currentTimeMillis()));
         Set<AccessRecord> accessRecords = new HashSet<>();
         accessRecords.add(accessRecord);
         secret.setAccessRecords(accessRecords);
@@ -127,13 +129,17 @@ class IndexControllerTest extends AbstractRestControllerTest {
     @Test
     void getSecretShouldReturnSecretAndAccessRecords() throws Exception {
         Mockito.when(secretService.getSecret(Mockito.eq(nanoId), Mockito.any(HttpServletRequest.class))).thenReturn(secret);
+        AccessRecord accessRecord = new ArrayList<>(secret.getAccessRecords()).get(0);
 
         mockMvc.perform(get("/" + nanoId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(nanoId)))
                 .andExpect(jsonPath("$.data", equalTo(secret.getData())))
                 .andExpect(jsonPath("$.expires", equalTo(secret.getExpires().getTime())))
-                .andExpect(jsonPath("$.accessRecords[0].secret", equalTo(secret.getId())));
+                .andExpect(jsonPath("$.accessRecords[0].secret").doesNotExist())
+                .andExpect(jsonPath("$.accessRecords[0].id").doesNotExist())
+                .andExpect(jsonPath("$.accessRecords[0].ip").value(accessRecord.getIp()))
+                .andExpect(jsonPath("$.accessRecords[0].time").value(accessRecord.getTime().getTime()));
     }
 
     @Test

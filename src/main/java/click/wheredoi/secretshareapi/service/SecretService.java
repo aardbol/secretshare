@@ -12,6 +12,8 @@ import click.wheredoi.secretshareapi.exception.NotFoundException;
 import click.wheredoi.secretshareapi.model.Secret;
 import click.wheredoi.secretshareapi.repo.SecretRepository;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,9 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class SecretService {
-
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final SecretRepository secretRepository;
-
     private final AccessService accessService;
 
     public SecretService(SecretRepository secretRepository, AccessService accessService) {
@@ -69,10 +70,12 @@ public class SecretService {
     }
 
     /**
-     * Delete expired, should be triggered by a cron job or so
-     * TODO: implement automation
+     * Delete expired, is automatically executed by cronDeleteExpiredSecrets()
+     *
+     * @see click.wheredoi.secretshareapi.ScheduledTasks
      */
     public void deleteExpiredSecrets() {
         secretRepository.deleteExpired();
+        logger.info("deleteExpiredSecrets(): expired secrets have been deleted");
     }
 }
