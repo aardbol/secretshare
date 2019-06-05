@@ -29,6 +29,7 @@ public class Secret {
     private Timestamp expires;
 
     @OneToMany(mappedBy = "secret")
+    @OrderBy("time desc")
     private Set<AccessRecord> accessRecords;
 
     public String getId() {
