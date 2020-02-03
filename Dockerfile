@@ -5,4 +5,4 @@ ARG JAR_FILE=target/*.jar
 WORKDIR /app
 COPY ${JAR_FILE} /app/secretshareapi.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=local", "/app/secretshareapi.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=container", "/app/secretshareapi.jar"]
