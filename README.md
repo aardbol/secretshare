@@ -27,6 +27,19 @@ privacy.
 * PostgreSQL 11
 * A-grade TLS encryption
 
+# Testing
+You can run a testing environment without too much setup. You just need to have docker-compose or 
+podman-compose (recommended) installed. 
+
+Have a look at the docker-compose.yml file and run it with: 
+
+`podman-compose up -d`
+
+That will setup a PostgreSQL database for you and run the latest API container image on port 8080.
+
+Remove the testing environment with:
+
+`podman-compose down`
 # License
 Open source under the EUROPEAN UNION PUBLIC LICENCE v. 1.2 
 
